@@ -1,0 +1,10 @@
+replicaCount: 3
+env:
+  WHOAMI_NAME: prod
+resources:
+  requests:
+    cpu: 100m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi

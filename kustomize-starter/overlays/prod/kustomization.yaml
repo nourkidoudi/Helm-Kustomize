@@ -1,0 +1,43 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: tp15-prod
+
+resources:
+  - ../../base
+  - namespace.yaml
+
+configMapGenerator:
+  - name: whoami-config
+    behavior: merge
+    literals:
+      - WHOAMI_NAME=prod
+
+replicas:
+  - name: whoami
+    count: 3
+
+images:
+  - name: traefik/whoami
+    newTag: v1.10.1
+
+patches:
+  # patch inline : limite mémoire à 128Mi
+  - target:
+      kind: Deployment
+      name: whoami
+    patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: whoami
+      spec:
+        template:
+          spec:
+            containers:
+              - name: whoami
+                resources:
+                  limits:
+                    memory: 128Mi
+  # patch stratégique depuis un fichier : readinessProbe
+  - path: readiness-patch.yaml
